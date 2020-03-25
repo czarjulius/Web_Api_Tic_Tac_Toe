@@ -1,8 +1,8 @@
+require "sinatra"
 
-module WebApiTicTacToe
-  class Welcome 
-    def Welcome
-      "Welcome"
+  class App < Sinatra::Base
+    get '/' do
+      "Welcome To TicTacToe"
     end
   end
-end
+
