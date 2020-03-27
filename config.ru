@@ -1,3 +1,3 @@
-require "./lib/Web_Api_Tic_Tac_Toe/Web_Api_Tic_Tac_Toe.rb"
+require "./lib/web_api/web_api.rb"
 
 run App

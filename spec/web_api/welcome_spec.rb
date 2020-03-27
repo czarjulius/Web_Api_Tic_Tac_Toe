@@ -1,4 +1,4 @@
-require_relative "../../lib/Web_Api_Tic_Tac_Toe/Web_Api_Tic_Tac_Toe.rb"
+require_relative "../../lib/web_api/web_api.rb"
 require 'rack/test'
 
 RSpec.describe App do
@@ -10,7 +10,7 @@ RSpec.describe App do
 
   it "should display Welcome To TicTacToe" do
     get '/'
-
+    expect(last_response).to be_ok
     expect(last_response.body).to eq("Welcome To TicTacToe")
   end
     
