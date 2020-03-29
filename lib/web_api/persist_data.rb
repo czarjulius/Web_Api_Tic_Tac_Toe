@@ -8,5 +8,8 @@ class PersistData
         @data.store(key,value)
     end
 
+    def get_detail(key)
+        @data[key]
+    end
 
 end
