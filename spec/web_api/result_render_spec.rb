@@ -1,5 +1,4 @@
 require 'rack/test'
-require 'json'
 require_relative "../../lib/web_api/result_render.rb"
 
 RSpec.describe ResultRenderer do

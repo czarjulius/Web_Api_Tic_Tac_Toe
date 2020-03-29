@@ -2,11 +2,13 @@ require "sinatra"
 require "game"
 require "json"
 require_relative "result_render"
+require_relative "persist_data"
+require_relative "game_output_type"
 
 enable :sessions
 
 class App < Sinatra::Base
-  def initialize(app=nil, data={})
+  def initialize(app=nil, data=PersistData.new)
     super(app)
     @data = data
 
@@ -23,48 +25,39 @@ class App < Sinatra::Base
 
   end
 
-
-  post '/choose_opponent' do
-    payload = JSON.parse(request.body.read)
-    opponent = payload['opponent']
-    
-    @data['opponent'] = opponent == "1" ? "human" : "computer"
-
-    @render.render(@data['opponent'])
-  end
-
   post '/player' do
+
     payload = JSON.parse(request.body.read)
     player = payload['player']
-    @data['player'] = player
-    @render.render(@data['player'])
+    @data.add_detail('player',player) 
+    @render.render(@data.data['player'])
   end
 
   post '/move' do
     payload = JSON.parse(request.body.read)
+    # validating
+    # payload has move
+    # move is not taken
+    # move is between 0 and 8 inclusinve
+    # player is not null
     move = payload["move"]
-    game = TicTacToeGame::Game.new.move(move)
+    player = @data.get_detail('player')
+    board = @data.get_detail('board')
+    toggle = TicTacToeGame::Toggle.new(player)
+    game = TicTacToeGame::Game.new(board,player, toggle)
+    game.move(move)
+    @data.add_detail('player', toggle.current_turn)
+    @data.add_detail('board', game.board)
+    if game.end?
+      game_output = GameOutputType.new.game_over_type(game)
+      return@render.render(game_output.game_over(player))
+    end
     @render.render(game.board)
   end
 
+  
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-  # get '/toggle' do
-  #   toggle = TicTacToeGame::Toggle.new("x")
-  #   toggle.other_turn
-  #   toggle.current_turn
-  # end
 end 
 
