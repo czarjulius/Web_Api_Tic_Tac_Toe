@@ -3,6 +3,7 @@ require "game"
 require "json"
 require_relative "result_render"
 require_relative "persist_data"
+require_relative "game_output_type"
 
 enable :sessions
 
@@ -23,8 +24,6 @@ class App < Sinatra::Base
     @render.render( "Welcome To TicTacToe")
 
   end
-
-
 
   post '/player' do
 
@@ -50,14 +49,14 @@ class App < Sinatra::Base
     @data.add_detail('player', toggle.current_turn)
     @data.add_detail('board', game.board)
     if game.end?
-      if game.blocked?
-        return @render.render("The game ended in a tie")
-      else
-        return @render.render("Player #{player} won the game")
-      end
+      game_output = GameOutputType.new.game_over_type(game)
+      return@render.render(game_output.game_over(player))
     end
     @render.render(game.board)
   end
+
+  
+
 
 
 end 
