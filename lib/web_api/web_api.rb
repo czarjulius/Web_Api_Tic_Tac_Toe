@@ -29,9 +29,7 @@ class App < Sinatra::Base
 
   post '/player' do
     payload = JSON.parse(request.body.read)
-    # p payload
-    player = payload["player"]
-    @validate.validate_player(player)
+    @validate.validate_player(payload)
     player = payload['player']
     @data.add_detail('player',player) 
     @render.render(@data.data['player'])
@@ -39,18 +37,15 @@ class App < Sinatra::Base
 
   post '/move' do
     payload = JSON.parse(request.body.read)
-    # validating
-    # payload has move
-    # move is not taken
 
-    # move is between 0 and 8 inclusinve
     # player is not null
     player = @data.get_detail('player')
+    @validate.validate_move_player(player)
+    
     board = @data.get_detail('board')
     play = TicTacToeGame::Play.new(board)
     move = payload["move"]
-
-    @validate.validate_move(move)
+    @validate.validate_move(payload)
     @validate.validate_spot(move, play.possible_moves)
     return @render.render(@validate.message) unless @validate.message.empty?
     toggle = TicTacToeGame::Toggle.new(player)

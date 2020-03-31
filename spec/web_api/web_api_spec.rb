@@ -23,10 +23,8 @@ RSpec.describe App do
   
 
   context "#move" do
-    it "Should rreturn a board with initial move" do
-      @persist_data.add_detail('player', 'x')
-      @persist_data.add_detail('board', ["-","-","-","-","-","-","-","-","-"])
-      
+    it "Should return a board with initial move" do
+      @persist_data.add_detail('player', 'x')      
       body={move: 0}.to_json
       post('/move', body, { 'CONTENT_TYPE' => 'application/json' })
       expected_result= {message: ["x","-","-","-","-","-","-","-","-"]}.to_json
@@ -37,7 +35,6 @@ RSpec.describe App do
     end
     it "Should return the updated board" do
       @persist_data.add_detail('player', 'x')
-      @persist_data.add_detail('board', ["-","-","-","-","-","-","-","-","-"])
         body={move: 2}.to_json
         post('/move', body, { 'CONTENT_TYPE' => 'application/json' })
 
@@ -50,8 +47,6 @@ RSpec.describe App do
 
     it "Should return the updated board for 'o'" do
       @persist_data.add_detail('player', 'o')
-
-      @persist_data.add_detail('board', ["-","-","-","-","-","-","-","-","-"])
       body={move: 2}.to_json
       post('/move', body, { 'CONTENT_TYPE' => 'application/json' })
 
@@ -64,8 +59,6 @@ RSpec.describe App do
 
   it "Should update the  board after multiple play" do
     @persist_data.add_detail('player', 'o')
-
-    @persist_data.add_detail('board', ["-","-","-","-","-","-","-","-","-"])
     body={move: 2}.to_json
     expected_result= {message: ["-","-","o","-","-","-","-","-","-"]}.to_json
     post('/move', body, { 'CONTENT_TYPE' => 'application/json' })
@@ -78,6 +71,7 @@ RSpec.describe App do
     expect(last_response).to be_ok
     expect(last_response.body).to eq(expected_result)
   end
+
 
   it "Should win a game by player o" do
     @persist_data.add_detail('player', 'o')
@@ -117,16 +111,5 @@ RSpec.describe App do
     expect(last_response.body).to eq(expected_result)
   end
 end
-
-context "#player" do
-  xit "contains . . ." do
-    body={}.to_json
-    expected_response = {message:'please pass a player field'}
-    post('/player', body, { 'CONTENT_TYPE' => 'application/json' })
-    expect(last_response).to be_ok
-    expect(last_response.body).to eq(expected_response)
-  end
-end
   
-    
 end
