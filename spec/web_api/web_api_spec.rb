@@ -12,12 +12,13 @@ RSpec.describe App do
   before(:each) do
     @persist_data = PersistData.new
   end
-
-  it "should display Welcome To TicTacToe" do
-    get '/'
-    expected_result = {message: "Welcome To TicTacToe"}.to_json
-    expect(last_response).to be_ok
-    expect(last_response.body).to eq(expected_result)
+  context"#Welcome" do
+    it "should display Welcome To TicTacToe" do
+      get '/'
+      expected_result = {message: "Welcome To TicTacToe"}.to_json
+      expect(last_response).to be_ok
+      expect(last_response.body).to eq(expected_result)
+    end
   end
 
   
@@ -72,7 +73,6 @@ RSpec.describe App do
     expect(last_response.body).to eq(expected_result)
   end
 
-
   it "Should win a game by player o" do
     @persist_data.add_detail('player', 'o')
     @persist_data.add_detail('board', ["-","-","o","-","o","x","-","-","x"])
@@ -107,6 +107,18 @@ RSpec.describe App do
     body={move: 5}.to_json
     expected_result= {message: "The move spot is taken, play another spot"}.to_json
     post('/move', body, { 'CONTENT_TYPE' => 'application/json' })
+    expect(last_response).to be_ok
+    expect(last_response.body).to eq(expected_result)
+  end
+end
+
+context "#opponent" do
+  it "should display human" do
+    body = {opponent: "1" }.to_json
+    post('/choose_opponent', body, { 'CONTENT_TYPE' => 'application/json' })
+    expected_result = {message: "human"}.to_json
+    puts last_response.errors
+
     expect(last_response).to be_ok
     expect(last_response.body).to eq(expected_result)
   end

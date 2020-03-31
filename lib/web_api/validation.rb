@@ -35,4 +35,14 @@ class Validation
             @message = "The move spot is taken, play another spot"
         end
     end
+
+    def validate_opponent(value)
+        return @message = "kindly pass an opponent field" unless value
+        opponent = value['opponent']
+        return @message = "Value can't be empty" if opponent == ""
+   
+        if opponent != 1 || opponent != 2
+            @message = "Value must be either 1 or 2"
+        end
+    end
 end

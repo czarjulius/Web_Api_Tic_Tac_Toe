@@ -22,9 +22,20 @@ class App < Sinatra::Base
   end
 
   get '/' do
-
     @render.render( "Welcome To TicTacToe")
+  end
 
+  post '/choose_opponent' do
+    payload = JSON.parse(request.body.read)
+
+    @validate.validate_opponent(payload)
+
+
+    opponent = payload['opponent']
+    current_opponent = opponent == "1" ? "human" : "computer"
+    @data.add_detail('opponent',current_opponent) 
+
+    @render.render(@data.data['opponent'])
   end
 
   post '/player' do
@@ -38,7 +49,6 @@ class App < Sinatra::Base
   post '/move' do
     payload = JSON.parse(request.body.read)
 
-    # player is not null
     player = @data.get_detail('player')
     @validate.validate_move_player(player)
     
