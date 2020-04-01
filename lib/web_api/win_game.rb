@@ -1,5 +1,5 @@
 class WinGame
     def game_over(player)
-        "Player #{player} won the game"
+        "#{player} won the game"
     end
 end
