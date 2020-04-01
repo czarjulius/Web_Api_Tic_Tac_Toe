@@ -23,12 +23,10 @@ RSpec.describe App do
   
 
   context "#move" do
-    it "Should return an initial board" do
-      @persist_data.add_detail('player', 'x')
-
+    it "Should return a board with initial move" do
+      @persist_data.add_detail('player', 'x')      
       body={move: 0}.to_json
       post('/move', body, { 'CONTENT_TYPE' => 'application/json' })
-
       expected_result= {message: ["x","-","-","-","-","-","-","-","-"]}.to_json
 
       expect(last_response).to be_ok
@@ -37,7 +35,6 @@ RSpec.describe App do
     end
     it "Should return the updated board" do
       @persist_data.add_detail('player', 'x')
-
         body={move: 2}.to_json
         post('/move', body, { 'CONTENT_TYPE' => 'application/json' })
 
@@ -75,6 +72,7 @@ RSpec.describe App do
     expect(last_response.body).to eq(expected_result)
   end
 
+
   it "Should win a game by player o" do
     @persist_data.add_detail('player', 'o')
     @persist_data.add_detail('board', ["-","-","o","-","o","x","-","-","x"])
@@ -86,7 +84,7 @@ RSpec.describe App do
   end
   it "Should win a game by player x" do
     @persist_data.add_detail('player', 'x')
-    @persist_data.add_detail('board', ["-","-","x","-","x","o","x","-","o"])
+    @persist_data.add_detail('board', ["-","-","x","-","x","o","-","-","o"])
     body={move: 6}.to_json
     expected_result= {message: "Player x won the game"}.to_json
     post('/move', body, { 'CONTENT_TYPE' => 'application/json' })
@@ -102,7 +100,16 @@ RSpec.describe App do
     expect(last_response).to be_ok
     expect(last_response.body).to eq(expected_result)
   end
+
+  it "Should return an error message that spot is not available" do
+    @persist_data.add_detail('player', 'o')
+    @persist_data.add_detail('board', ["o","x","o","x","o","x","x","-","x"])
+    body={move: 5}.to_json
+    expected_result= {message: "The move spot is taken, play another spot"}.to_json
+    post('/move', body, { 'CONTENT_TYPE' => 'application/json' })
+    expect(last_response).to be_ok
+    expect(last_response.body).to eq(expected_result)
+  end
 end
   
-    
 end

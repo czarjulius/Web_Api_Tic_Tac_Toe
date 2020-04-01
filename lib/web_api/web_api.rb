@@ -4,6 +4,7 @@ require "json"
 require_relative "result_render"
 require_relative "persist_data"
 require_relative "game_output_type"
+require_relative "validation"
 
 enable :sessions
 
@@ -17,6 +18,7 @@ class App < Sinatra::Base
   before do
     content_type 'application/json'
     @render = ResultRenderer.new
+    @validate = Validation.new
   end
 
   get '/' do
@@ -26,8 +28,8 @@ class App < Sinatra::Base
   end
 
   post '/player' do
-
     payload = JSON.parse(request.body.read)
+    @validate.validate_player(payload)
     player = payload['player']
     @data.add_detail('player',player) 
     @render.render(@data.data['player'])
@@ -35,14 +37,17 @@ class App < Sinatra::Base
 
   post '/move' do
     payload = JSON.parse(request.body.read)
-    # validating
-    # payload has move
-    # move is not taken
-    # move is between 0 and 8 inclusinve
+
     # player is not null
-    move = payload["move"]
     player = @data.get_detail('player')
+    @validate.validate_move_player(player)
+    
     board = @data.get_detail('board')
+    play = TicTacToeGame::Play.new(board)
+    move = payload["move"]
+    @validate.validate_move(payload)
+    @validate.validate_spot(move, play.possible_moves)
+    return @render.render(@validate.message) unless @validate.message.empty?
     toggle = TicTacToeGame::Toggle.new(player)
     game = TicTacToeGame::Game.new(board,player, toggle)
     game.move(move)
