@@ -12,6 +12,10 @@ class PersistData
     def get_detail(key)
         if key == 'board'
             return @data[key] || Array.new(9,"-")
+        elsif key == 'player'
+            return @data[key] || 'x'
+        elsif key == 'opponent'
+            return @data[key] || 'human'
         end
         @data[key]
     end

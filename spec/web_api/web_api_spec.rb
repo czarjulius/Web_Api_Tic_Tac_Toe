@@ -22,10 +22,8 @@ RSpec.describe App do
   end
 
   
-
   context "#move" do
-    it "Should return a board with initial move" do
-      @persist_data.add_detail('player', 'x')      
+    it "Should return a board with initial move" do    
       body={move: 0}.to_json
       post('/move', body, { 'CONTENT_TYPE' => 'application/json' })
       expected_result= {message: ["x","-","-","-","-","-","-","-","-"]}.to_json
@@ -35,7 +33,6 @@ RSpec.describe App do
 
     end
     it "Should return the updated board" do
-      @persist_data.add_detail('player', 'x')
         body={move: 2}.to_json
         post('/move', body, { 'CONTENT_TYPE' => 'application/json' })
 
@@ -73,20 +70,21 @@ RSpec.describe App do
     expect(last_response.body).to eq(expected_result)
   end
 
-  it "Should win a game by player o" do
+  it "Should win a game by player2" do
+    @persist_data.add_detail('current_player', 'player2')
     @persist_data.add_detail('player', 'o')
     @persist_data.add_detail('board', ["-","-","o","-","o","x","-","-","x"])
     body={move: 6}.to_json
-    expected_result= {message: "Player o won the game"}.to_json
+    expected_result= {message: "player2 won the game"}.to_json
     post('/move', body, { 'CONTENT_TYPE' => 'application/json' })
     expect(last_response).to be_ok
     expect(last_response.body).to eq(expected_result)
   end
-  it "Should win a game by player x" do
-    @persist_data.add_detail('player', 'x')
+  it "Should win a game by player1" do
+    @persist_data.add_detail('current_player', 'player1')
     @persist_data.add_detail('board', ["-","-","x","-","x","o","-","-","o"])
     body={move: 6}.to_json
-    expected_result= {message: "Player x won the game"}.to_json
+    expected_result= {message: "player1 won the game"}.to_json
     post('/move', body, { 'CONTENT_TYPE' => 'application/json' })
     expect(last_response).to be_ok
     expect(last_response.body).to eq(expected_result)
@@ -114,7 +112,7 @@ end
 
 context "#opponent" do
   it "should display human" do
-    body = {opponent: "1" }.to_json
+    body = {opponent: "human" }.to_json
     post('/choose_opponent', body, { 'CONTENT_TYPE' => 'application/json' })
     expected_result = {message: "human"}.to_json
     puts last_response.errors
@@ -123,5 +121,6 @@ context "#opponent" do
     expect(last_response.body).to eq(expected_result)
   end
 end
+
   
 end
