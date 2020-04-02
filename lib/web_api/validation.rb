@@ -19,7 +19,7 @@ class Validation
         return @message = "kindly pass a player field" unless value
         player = value['player'].downcase
         return @message = "Value can't be empty" if player.empty?
-        
+
         unless player == "human" || player == "computer"
             @message = "Value must be either human or computer"
         end
@@ -29,6 +29,10 @@ class Validation
         return @message = "kindly pass a move field" unless value
         move = value['move']
         return @message = "Value can't be empty" if move == ""
+        
+        unless !move.kind_of? String
+            @message = "Value must be an integer"
+        end
     end
 
     def validate_move_player(player)
@@ -41,6 +45,8 @@ class Validation
     def validate_spot(move,possible_move)
         if possible_move.include?(move)
             'fine'
+        elsif move.kind_of? String
+            @message = "Value must be an integer"
         elsif move >=9
             @message = "Move is out of range"
         else

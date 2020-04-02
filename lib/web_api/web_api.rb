@@ -36,8 +36,6 @@ class App < Sinatra::Base
     
     return @render.render(@validate.message) unless @validate.message.empty?
     opponent = payload['opponent']
-    # p "+++++++++++++++++++"
-    # p opponent
     @data.add_detail('opponent',opponent) 
     @render.render(opponent)
   end
