@@ -16,5 +16,6 @@ RSpec.describe PersistData do
         expected_result = "julius"
         expect(persist_data.get_detail('name')).to eq(expected_result)
     end
+    
 
 end

@@ -59,9 +59,15 @@ RSpec.describe Validation do
             expected_result = "Value can't be empty"
             expect(validation.validate_move(data)).to eq(expected_result)
         end
+        it "returns error message when move value is not an integer" do
+            validation = Validation.new
+            data  = {"move" => "b"}
+            expected_result = "Value must be an integer"
+            expect(validation.validate_move(data)).to eq(expected_result)
+        end
 
         
-
+    context "#validate_spot" do
         it "returns empty message when move is available" do
             validation = Validation.new
             move= 3
@@ -87,8 +93,9 @@ RSpec.describe Validation do
             validation.validate_spot(move,possible_moves)
             expect(validation.message).to eq(expected_result)
         end
+    end
 
-
+    context "#validate_move_player" do
         it "returns error message when move player is empty" do
             validation = Validation.new
             player= nil
@@ -96,7 +103,9 @@ RSpec.describe Validation do
             validation.validate_move_player(player)
             expect(validation.message).to eq(expected_result)
         end
+    end
 
+    context "#validate_move_opponent" do
         it "returns error message when move opponent is empty" do
             validation = Validation.new
             opponent= nil
@@ -104,6 +113,8 @@ RSpec.describe Validation do
             validation.validate_move_opponent(opponent)
             expect(validation.message).to eq(expected_result)
         end
+    end
+
     end
     context "#opponent" do
         it "returns error message when opponent field is nil" do

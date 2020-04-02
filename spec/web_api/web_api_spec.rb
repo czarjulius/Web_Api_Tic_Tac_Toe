@@ -1,5 +1,6 @@
 require_relative "../../lib/web_api/web_api.rb"
 require_relative "../../lib/web_api/persist_data.rb"
+require_relative "../../lib/web_api/human_human_toggle"
 require 'rack/test'
 
 RSpec.describe App do
@@ -11,6 +12,8 @@ RSpec.describe App do
   
   before(:each) do
     @persist_data = PersistData.new
+    @human_computer_toggle = HumanComputerToggle.new
+    @human_human_toggle = HumanHumanToggle.new
   end
   context"#Welcome" do
     it "should display Welcome To TicTacToe" do
@@ -55,72 +58,110 @@ RSpec.describe App do
 
     end
 
-  it "Should update the  board after multiple play" do
-    @persist_data.add_detail('player', 'o')
-    body={move: 2}.to_json
-    expected_result= {message: ["-","-","o","-","-","-","-","-","-"]}.to_json
-    post('/move', body, { 'CONTENT_TYPE' => 'application/json' })
-    expect(last_response).to be_ok
-    expect(last_response.body).to eq(expected_result)
+    it "Should update the  board after multiple play" do
+      @persist_data.add_detail('player', 'o')
+      body={move: 2}.to_json
+      expected_result= {message: ["-","-","o","-","-","-","-","-","-"]}.to_json
+      post('/move', body, { 'CONTENT_TYPE' => 'application/json' })
+      expect(last_response).to be_ok
+      expect(last_response.body).to eq(expected_result)
 
-    body={move: 1}.to_json
-    expected_result= {message: ["-","x","o","-","-","-","-","-","-"]}.to_json
-    post('/move', body, { 'CONTENT_TYPE' => 'application/json' })
-    expect(last_response).to be_ok
-    expect(last_response.body).to eq(expected_result)
+      body={move: 1}.to_json
+      expected_result= {message: ["-","x","o","-","-","-","-","-","-"]}.to_json
+      post('/move', body, { 'CONTENT_TYPE' => 'application/json' })
+      expect(last_response).to be_ok
+      expect(last_response.body).to eq(expected_result)
+    end
+    it "Should update the  current player human to computer" do
+      @persist_data.add_detail('opponent', 'computer')
+      @persist_data.add_detail('current_player', 'human')
+      body={move: 2}.to_json
+      post('/move', body, { 'CONTENT_TYPE' => 'application/json' })
+      expect(@persist_data.get_detail('current_player')).to eq('computer')
+    end
+    it "Should update the  current player1 to player2" do
+      @persist_data.add_detail('current_player', 'player1')
+      body={move: 2}.to_json
+      post('/move', body, { 'CONTENT_TYPE' => 'application/json' })
+      expect(@persist_data.get_detail('current_player')).to eq('player2')
+    end
+
+    it "Should win a game by player2" do
+      @persist_data.add_detail('current_player', 'player2')
+      @persist_data.add_detail('player', 'o')
+      @persist_data.add_detail('board', ["-","-","o","-","o","x","-","-","x"])
+      body={move: 6}.to_json
+      expected_result= {message: "player2 won the game"}.to_json
+      post('/move', body, { 'CONTENT_TYPE' => 'application/json' })
+      expect(last_response).to be_ok
+      expect(last_response.body).to eq(expected_result)
+    end
+    it "Should win a game by computer" do
+      @persist_data.add_detail('current_player', 'computer')
+      @persist_data.add_detail('player', 'o')
+      @persist_data.add_detail('opponent', 'computer')
+      @persist_data.add_detail('board', ["-","-","o","-","o","x","-","-","x"])
+      body={move: 6}.to_json
+      expected_result= {message: "computer won the game"}.to_json
+      post('/move', body, { 'CONTENT_TYPE' => 'application/json' })
+      puts last_response.errors
+      expect(last_response).to be_ok
+      expect(last_response.body).to eq(expected_result)
+    end
+    it "Should win a game by human" do
+      @persist_data.add_detail('current_player', 'human')
+      @persist_data.add_detail('player', 'o')
+      @persist_data.add_detail('opponent', 'computer')
+      @persist_data.add_detail('board', ["-","-","o","-","o","x","-","-","x"])
+      body={move: 6}.to_json
+      expected_result= {message: "human won the game"}.to_json
+      post('/move', body, { 'CONTENT_TYPE' => 'application/json' })
+      puts last_response.errors
+      expect(last_response).to be_ok
+      expect(last_response.body).to eq(expected_result)
+    end
+
+    it "Should win a game by player1" do
+      @persist_data.add_detail('current_player', 'player1')
+      @persist_data.add_detail('board', ["-","-","x","-","x","o","-","-","o"])
+      body={move: 6}.to_json
+      expected_result= {message: "player1 won the game"}.to_json
+      post('/move', body, { 'CONTENT_TYPE' => 'application/json' })
+      expect(last_response).to be_ok
+      expect(last_response.body).to eq(expected_result)
+    end
+    it "Should end the game in a tie" do
+      @persist_data.add_detail('player', 'o')
+      @persist_data.add_detail('board', ["o","x","o","x","o","x","x","-","x"])
+      body={move: 7}.to_json
+      expected_result= {message: "The game ended in a tie"}.to_json
+      post('/move', body, { 'CONTENT_TYPE' => 'application/json' })
+      expect(last_response).to be_ok
+      expect(last_response.body).to eq(expected_result)
+    end
+
+    it "Should return an error message that spot is not available" do
+      @persist_data.add_detail('player', 'o')
+      @persist_data.add_detail('board', ["o","x","o","x","o","x","x","-","x"])
+      body={move: 5}.to_json
+      expected_result= {message: "The move spot is taken, play another spot"}.to_json
+      post('/move', body, { 'CONTENT_TYPE' => 'application/json' })
+      expect(last_response).to be_ok
+      expect(last_response.body).to eq(expected_result)
+    end
   end
 
-  it "Should win a game by player2" do
-    @persist_data.add_detail('current_player', 'player2')
-    @persist_data.add_detail('player', 'o')
-    @persist_data.add_detail('board', ["-","-","o","-","o","x","-","-","x"])
-    body={move: 6}.to_json
-    expected_result= {message: "player2 won the game"}.to_json
-    post('/move', body, { 'CONTENT_TYPE' => 'application/json' })
-    expect(last_response).to be_ok
-    expect(last_response.body).to eq(expected_result)
-  end
-  it "Should win a game by player1" do
-    @persist_data.add_detail('current_player', 'player1')
-    @persist_data.add_detail('board', ["-","-","x","-","x","o","-","-","o"])
-    body={move: 6}.to_json
-    expected_result= {message: "player1 won the game"}.to_json
-    post('/move', body, { 'CONTENT_TYPE' => 'application/json' })
-    expect(last_response).to be_ok
-    expect(last_response.body).to eq(expected_result)
-  end
-  it "Should end the game in a tie" do
-    @persist_data.add_detail('player', 'o')
-    @persist_data.add_detail('board', ["o","x","o","x","o","x","x","-","x"])
-    body={move: 7}.to_json
-    expected_result= {message: "The game ended in a tie"}.to_json
-    post('/move', body, { 'CONTENT_TYPE' => 'application/json' })
-    expect(last_response).to be_ok
-    expect(last_response.body).to eq(expected_result)
-  end
+  context "#opponent" do
+    it "should display human" do
+      body = {opponent: "human" }.to_json
+      post('/choose_opponent', body, { 'CONTENT_TYPE' => 'application/json' })
+      expected_result = {message: "human"}.to_json
+      puts last_response.errors
 
-  it "Should return an error message that spot is not available" do
-    @persist_data.add_detail('player', 'o')
-    @persist_data.add_detail('board', ["o","x","o","x","o","x","x","-","x"])
-    body={move: 5}.to_json
-    expected_result= {message: "The move spot is taken, play another spot"}.to_json
-    post('/move', body, { 'CONTENT_TYPE' => 'application/json' })
-    expect(last_response).to be_ok
-    expect(last_response.body).to eq(expected_result)
+      expect(last_response).to be_ok
+      expect(last_response.body).to eq(expected_result)
+    end
   end
-end
-
-context "#opponent" do
-  it "should display human" do
-    body = {opponent: "human" }.to_json
-    post('/choose_opponent', body, { 'CONTENT_TYPE' => 'application/json' })
-    expected_result = {message: "human"}.to_json
-    puts last_response.errors
-
-    expect(last_response).to be_ok
-    expect(last_response.body).to eq(expected_result)
-  end
-end
 
   
 end
