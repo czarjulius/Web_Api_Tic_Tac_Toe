@@ -30,6 +30,11 @@ class App < Sinatra::Base
     @render.render( "Welcome To TicTacToe")
   end
 
+  delete '/play_again' do
+    @data.reset_detail
+    
+  end
+
   post '/choose_opponent' do
     payload = JSON.parse(request.body.read)
 

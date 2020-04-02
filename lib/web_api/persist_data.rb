@@ -20,5 +20,10 @@ class PersistData
         @data[key]
     end
 
+    def reset_detail
+        @data.clear
+        "Data reset to an empty hash"
+    end
+
     
 end

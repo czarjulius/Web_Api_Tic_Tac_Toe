@@ -16,6 +16,12 @@ RSpec.describe PersistData do
         expected_result = "julius"
         expect(persist_data.get_detail('name')).to eq(expected_result)
     end
-    
+    it "should reset the hash to an empty hash" do
+        data = {'name' => "julius"}
+        persist_data = PersistData.new(data)
+
+        expected_result = "Data reset to an empty hash"
+        expect(persist_data.reset_detail).to eq(expected_result)
+    end
 
 end
