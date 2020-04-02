@@ -20,4 +20,5 @@ class PersistData
         @data[key]
     end
 
+    
 end

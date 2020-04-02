@@ -3,7 +3,7 @@ require "game"
 require "json"
 require_relative "result_render"
 require_relative "persist_data"
-require_relative "game_output_type"
+require_relative "game_type"
 require_relative "validation"
 require_relative "human_computer_toggle"
 require_relative "human_human_toggle"
@@ -23,6 +23,7 @@ class App < Sinatra::Base
     @validate = Validation.new
     @human_computer_toggle = HumanComputerToggle.new
     @human_human_toggle = HumanHumanToggle.new
+    @get_current_player = CurrentPlayerType.new
   end
 
   get '/' do
@@ -74,17 +75,12 @@ class App < Sinatra::Base
     toggle = TicTacToeGame::Toggle.new(player)
     game = TicTacToeGame::Game.new(board,player, toggle)
 
-
-    
     if opponent == 'human'
       game.move(move)
-      current_player == @human_human_toggle.current_turn(current_player)
+      current_player = @human_human_toggle.current_turn(current_player)
     else
-      if current_player == 'human'
-        game.move(move)
-      else
-        game.move(game.best_move)
-      end
+      get_move = @get_current_player.get_current_player(current_player)
+      get_move.make_move(game,move)
       current_player =  @human_computer_toggle.current_turn(current_player)
     end
 
@@ -98,6 +94,7 @@ class App < Sinatra::Base
     @data.add_detail('current_player', current_player)
     @render.render(game.board)
   end
+
 
 end 
 
