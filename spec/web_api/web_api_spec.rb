@@ -1,6 +1,5 @@
 require_relative "../../lib/web_api/web_api.rb"
 require_relative "../../lib/web_api/persist_data.rb"
-require_relative "../../lib/web_api/human_human_toggle"
 require 'rack/test'
 
 RSpec.describe App do
@@ -12,8 +11,6 @@ RSpec.describe App do
   
   before(:each) do
     @persist_data = PersistData.new
-    @human_computer_toggle = HumanComputerToggle.new
-    @human_human_toggle = HumanHumanToggle.new
   end
   context"#Welcome" do
     it "should display Welcome To TicTacToe" do

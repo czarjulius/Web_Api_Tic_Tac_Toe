@@ -5,8 +5,6 @@ require_relative "result_render"
 require_relative "persist_data"
 require_relative "game_type"
 require_relative "validation"
-require_relative "human_computer_toggle"
-require_relative "human_human_toggle"
 
 enable :sessions
 
@@ -21,8 +19,8 @@ class App < Sinatra::Base
     content_type 'application/json'
     @render = ResultRenderer.new
     @validate = Validation.new
-    @human_computer_toggle = HumanComputerToggle.new
-    @human_human_toggle = HumanHumanToggle.new
+    @human_computer_toggle = TicTacToeGame::HumanComputerToggle.new
+    @human_human_toggle = TicTacToeGame::HumanHumanToggle.new
     @get_current_player = CurrentPlayerType.new
   end
 

@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/czarjulius/Gemfile_TicTacToe.git
-  revision: 4f745601a09aa2e03cd7893980b5f214e9e93762
+  revision: 9eea4abfae339a3b6180ef03ba24aae655c6d851
   branch: master
   specs:
     game (1.0.0)
