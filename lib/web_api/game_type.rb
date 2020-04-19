@@ -14,11 +14,11 @@ class GameOutputType
 end
 
 class CurrentPlayerType
-  def get_current_player(current_player)
-    if current_player == 'human'
-      HumanMove.new
-    else
+  def get_player(current_player)
+    if current_player == 'computer'
       ComputerMove.new
+    else
+      HumanMove.new
     end
   end
 end

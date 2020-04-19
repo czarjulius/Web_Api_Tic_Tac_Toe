@@ -19,9 +19,8 @@ class App < Sinatra::Base
     content_type 'application/json'
     @render = ResultRenderer.new
     @validate = Validation.new
-    @human_computer_toggle = TicTacToeGame::HumanComputerToggle.new
-    @human_human_toggle = TicTacToeGame::HumanHumanToggle.new
-    @get_current_player = CurrentPlayerType.new
+    @toggle = get_toggle
+    @player_type = CurrentPlayerType.new
   end
 
   get '/' do
@@ -59,6 +58,15 @@ class App < Sinatra::Base
     @render.render(player)
   end
 
+  def get_toggle
+    opponent = @data.get_detail('opponent')
+    if opponent == "human"
+     return TicTacToeGame::HumanHumanToggle.new
+    end
+     return TicTacToeGame::HumanComputerToggle.new
+  end
+
+
   post '/move' do
     payload = JSON.parse(request.body.read)
 
@@ -71,21 +79,16 @@ class App < Sinatra::Base
     
     board = @data.get_detail('board')
     play = TicTacToeGame::Play.new(board)
-    move = payload["move"]
+    move_position = payload["move"]
     @validate.validate_move(payload)
-    @validate.validate_spot(move, play.possible_moves) unless current_player == 'computer'
+    @validate.validate_spot(move_position, play.possible_moves) unless current_player == 'computer'
     return @render.render(@validate.message) unless @validate.message.empty?
     toggle = TicTacToeGame::Toggle.new(player)
     game = TicTacToeGame::Game.new(board,player, toggle)
 
-    if opponent == 'human'
-      game.move(move)
-      current_player = @human_human_toggle.current_turn(current_player)
-    else
-      get_move = @get_current_player.get_current_player(current_player)
-      get_move.make_move(game,move)
-      current_player =  @human_computer_toggle.current_turn(current_player)
-    end
+    current_player_type = @player_type.get_player(current_player)
+    current_player_type.make_move(game,move_position)
+    current_player =  @toggle.current_turn(current_player)
 
     if game.end?
       game_output = GameOutputType.new.game_over_type(game)
@@ -97,7 +100,6 @@ class App < Sinatra::Base
     @data.add_detail('current_player', current_player)
     @render.render(game.board)
   end
-
 
 end 
 
